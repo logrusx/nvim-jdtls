@@ -88,8 +88,8 @@ function M.start_debug_adapter(callback, config)
   local jdtls = vim.tbl_filter(function(client)
     return client.name == 'jdtls'
 
-      and client.config
-      and client.config.root_dir == config.cwd
+        and client.config
+        and client.config.root_dir == config.cwd
   end, util.get_clients())[1]
 
   local bufnr = vim.lsp.get_buffers_by_client_id(jdtls and jdtls.id)[1] or vim.api.nvim_get_current_buf()
@@ -334,7 +334,7 @@ end
 local function testng_runner()
   local vscode_runner = 'com.microsoft.java.test.runner-jar-with-dependencies.jar'
 
-  local client = util.get_clients({name='jdtls'})[1]
+  local client = util.get_clients({ name = 'jdtls' })[1]
 
   local bundles = client and client.config.init_options.bundles or {}
   for _, jar_path in pairs(bundles) do
@@ -609,7 +609,7 @@ function M.fetch_main_configs(opts, callback)
   local configurations = {}
   local bufnr = api.nvim_get_current_buf()
 
-  local jdtls = util.get_clients({ bufnr = bufnr, name = "jdtls"})[1]
+  local jdtls = util.get_clients({ bufnr = bufnr, name = "jdtls" })[1]
 
   local root_dir = jdtls and jdtls.config and jdtls.config.root_dir
   util.execute_command({ command = 'vscode.java.resolveMainClass' }, function(err, mainclasses)
@@ -738,31 +738,31 @@ function M.setup_dap(opts)
   end
   dap.adapters.java = M.start_debug_adapter
 
-  -- if dap.providers and dap.providers.configs then
-  --   dap.providers.configs["jdtls"] = function(bufnr)
-  --     if vim.bo[bufnr].filetype ~= "java" then
-  --       return {}
-  --     end
-  --     local co = coroutine.running()
-  --     local resumed = false
-  --     vim.defer_fn(function()
-  --       if not resumed then
-  --         resumed = true
-  --         coroutine.resume(co, {})
-  --         vim.schedule(function()
-  --           vim.notify("Discovering main classes took too long", vim.log.levels.INFO)
-  --         end)
-  --       end
-  --     end, 2000)
-  --     M.fetch_main_configs(nil, function(configs)
-  --       if not resumed then
-  --         resumed = true
-  --         coroutine.resume(co, configs)
-  --       end
-  --     end)
-  --     return coroutine.yield()
-  --   end
-  -- end
+  if dap.providers and dap.providers.configs then
+    dap.providers.configs["jdtls"] = function(bufnr)
+      if vim.bo[bufnr].filetype ~= "java" then
+        return {}
+      end
+      local co = coroutine.running()
+      local resumed = false
+      vim.defer_fn(function()
+        if not resumed then
+          resumed = true
+          coroutine.resume(co, {})
+          vim.schedule(function()
+            vim.notify("Discovering main classes took too long", vim.log.levels.INFO)
+          end)
+        end
+      end, 2000)
+      M.fetch_main_configs(nil, function(configs)
+        if not resumed then
+          resumed = true
+          coroutine.resume(co, configs)
+        end
+      end)
+      return coroutine.yield()
+    end
+  end
 end
 
 ---@class JdtSetupDapOpts
