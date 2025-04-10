@@ -40,7 +40,8 @@ function M.execute_command(command, callback, bufnr)
 
   if num_clients > 1 then
     vim.notify(
-      'Multiple LSP clients found that support ' .. command.command .. ' you should have at most one JDTLS server running',
+      'Multiple LSP clients found that support ' ..
+      command.command .. ' you should have at most one JDTLS server running',
       vim.log.levels.WARN)
   end
 
@@ -59,7 +60,6 @@ function M.execute_command(command, callback, bufnr)
   end
 end
 
-
 ---@param mainclass string
 ---@param project string
 ---@param fn fun(java_exec: string)
@@ -73,7 +73,7 @@ function M.with_java_executable(mainclass, project, fn, bufnr)
 
   local client = M.get_clients({ name = "jdtls", bufnr = bufnr, method = "workspace/executeCommand" })[1]
   if not client then
-    vim.notify("No jdtls client found for bufnr=" .. bufnr, vim.log.levels.INFO)
+    vim.notify("No jdtls client found for bufnr=" .. bufnr, vim.log.levels.DEBUG)
     return
   end
 
@@ -120,7 +120,6 @@ function M.with_java_executable(mainclass, project, fn, bufnr)
   client:request("workspace/executeCommand", params, on_response, bufnr)
 end
 
-
 function M.with_classpaths(fn)
   local bufnr = api.nvim_get_current_buf()
   local uri = vim.uri_from_bufnr(bufnr)
@@ -136,12 +135,12 @@ function M.with_classpaths(fn)
       local err, is_test_file = M.execute_command(is_test_file_cmd, nil, bufnr)
       assert(not err, vim.inspect(err))
       options = vim.fn.json_encode({
-        scope = is_test_file and 'test' or 'runtime';
+        scope = is_test_file and 'test' or 'runtime',
       })
     end
     local cmd = {
-      command = 'java.project.getClasspaths';
-      arguments = { uri, options };
+      command = 'java.project.getClasspaths',
+      arguments = { uri, options },
     }
     local err1, resp = M.execute_command(cmd, nil, bufnr)
     if err1 then
@@ -151,7 +150,6 @@ function M.with_classpaths(fn)
     end
   end)
 end
-
 
 function M.resolve_classname()
   local lines = api.nvim_buf_get_lines(0, 0, -1, true)
@@ -170,6 +168,5 @@ function M.resolve_classname()
     return classname
   end
 end
-
 
 return M
