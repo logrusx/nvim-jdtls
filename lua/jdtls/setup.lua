@@ -7,7 +7,7 @@ local URI_SCHEME_PATTERN = '^([a-zA-Z]+[a-zA-Z0-9+-.]*)://.*'
 
 local status_callback = function(_, result)
   api.nvim_command(string.format(':echohl Function | echo "%s" | echohl None',
-                                string.sub(result.message, 1, vim.v.echospace)))
+    string.sub(result.message, 1, vim.v.echospace)))
 end
 
 
@@ -85,7 +85,6 @@ function M.find_root(markers, source)
     dirname = getparent(dirname)
   end
 end
-
 
 M.extendedClientCapabilities = {
   classFileContentsSupport = true,
@@ -201,7 +200,6 @@ end
 ---@param client vim.lsp.Client
 ---@param opts jdtls.start.opts
 local function add_commands(client, bufnr, opts)
-
   ---@param name string
   local function create_cmd(name, command, cmdopts)
     api.nvim_buf_create_user_command(bufnr, name, command, cmdopts or {})
@@ -233,7 +231,7 @@ local function add_commands(client, bufnr, opts)
       return
     end
 
-    require("jdtls.dap").setup_dap(opts.dap or {})
+    -- require("jdtls.dap").setup_dap(opts.dap or {})
     api.nvim_command "command! -buffer JdtUpdateDebugConfig lua require('jdtls.dap').setup_dap_main_class_configs({ verbose = true })"
     local redefine_classes = function()
       local session = dap.session()
@@ -251,7 +249,7 @@ local function add_commands(client, bufnr, opts)
     })
   end
   local selected_profiles = "org.eclipse.m2e.core.selectedProfiles"
-  create_cmd("JdtUpdateMavenActiveProfiles", function (o)
+  create_cmd("JdtUpdateMavenActiveProfiles", function(o)
     local active_profiles = o.args
     local settings = {
       [selected_profiles] = active_profiles
@@ -264,7 +262,7 @@ local function add_commands(client, bufnr, opts)
   end, {
     nargs = "?",
   })
-  create_cmd("JdtShowMavenActiveProfiles", function (_)
+  create_cmd("JdtShowMavenActiveProfiles", function(_)
     local params = {
       command = "java.project.getSettings",
       arguments = {
@@ -307,7 +305,7 @@ function M.start_or_attach(config, opts, start_opts)
   assert(
     config.cmd and type(config.cmd) == 'table',
     'Config must have a `cmd` property and that must be a table. Got: '
-      .. table.concat(config.cmd or {'nil'}, ' ')
+    .. table.concat(config.cmd or { 'nil' }, ' ')
   )
   config.name = 'jdtls'
   local on_attach = config.on_attach
@@ -336,7 +334,7 @@ function M.start_or_attach(config, opts, start_opts)
   end
 
   config.root_dir = (config.root_dir
-    or M.find_root({'.git', 'gradlew', 'mvnw'}, bufname)
+    or M.find_root({ '.git', 'gradlew', 'mvnw' }, bufname)
     or vim.fn.getcwd()
   )
   config.handlers = config.handlers or {}
@@ -415,8 +413,8 @@ function M.start_or_attach(config, opts, start_opts)
         codeActionLiteralSupport = {
           codeActionKind = {
             valueSet = code_action_literals
-          };
-        };
+          },
+        },
       }
     }
   }
@@ -436,7 +434,6 @@ function M.start_or_attach(config, opts, start_opts)
   return vim.lsp.start(config, start_opts)
 end
 
-
 function M.wipe_data_and_restart()
   local data_dir, client = extract_data_dir(vim.api.nvim_get_current_buf())
   if not data_dir or not client then
@@ -448,7 +445,7 @@ function M.wipe_data_and_restart()
   local opts = {
     prompt = 'Are you sure you want to wipe the data folder: ' .. data_dir .. ' and restart? ',
   }
-  vim.ui.select({'Yes', 'No'}, opts, function(choice)
+  vim.ui.select({ 'Yes', 'No' }, opts, function(choice)
     if choice ~= 'Yes' then
       return
     end
@@ -474,11 +471,9 @@ function M.wipe_data_and_restart()
   end)
 end
 
-
 ---@deprecated not needed, start automatically adds commands
 function M.add_commands()
 end
-
 
 function M.show_logs()
   local data_dir = extract_data_dir(vim.api.nvim_get_current_buf())
@@ -491,6 +486,5 @@ function M.show_logs()
     vim.cmd('vsplit | e ' .. vim.fn.stdpath('cache') .. '/lsp.log | normal G')
   end
 end
-
 
 return M
