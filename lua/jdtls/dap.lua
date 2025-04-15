@@ -602,7 +602,7 @@ local hotcodereplace_type = {
 function M.fetch_main_configs(opts, callback)
   opts = opts or {}
   if type(opts) == 'function' then
-    vim.notify('First argument to `fetch_main_configs` changed to a `opts` table', vim.log.levels.WARN)
+    vim.notify('First argument to `fetch_main_configs` changed to a `opts` table', vim.log.levels.DEBUG)
     callback = opts
     opts = {}
   end
