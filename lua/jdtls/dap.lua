@@ -587,7 +587,7 @@ function M.pick_test(opts)
   end)
 end
 
-local hotcodereplace_type = {
+M.hotcodereplace_type = {
   ERROR = "ERROR",
   WARNING = "WARNING",
   STARTING = "STARTING",
@@ -725,7 +725,7 @@ function M.setup_dap(opts)
   end
 
   dap.listeners.before['event_hotcodereplace']['jdtls'] = function(session, body)
-    if body.changeType == hotcodereplace_type.BUILD_COMPLETE then
+    if body.changeType == M.hotcodereplace_type.BUILD_COMPLETE then
       if opts.hotcodereplace == 'auto' then
         vim.notify('Applying code changes')
         session:request('redefineClasses', nil, function(err)
